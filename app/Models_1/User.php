@@ -34,9 +34,11 @@ class User extends Model
 {
 	protected $table = 'users';
 	protected $primaryKey = 'idUser';
+	public $incrementing = false;
 	public $timestamps = false;
 
 	protected $casts = [
+		'idUser' => 'int',
 		'platform' => 'int',
 		'idActualTeam' => 'int'
 	];
