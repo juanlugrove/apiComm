@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('/usuarios','App\Http\Controllers\UserController@index'); //mostrar todos los usuarios
+Route::get('/usuarios/{id}','App\Http\Controllers\UserController@show'); //mostrar un usuario
+Route::post('/usuarios','App\Http\Controllers\UserController@store'); //crear usuario
+Route::put('/usuarios/{id}','App\Http\Controllers\UserController@update'); //actualizar
+Route::delete('/usuarios/{id}','App\Http\Controllers\UserController@destroy'); //borrar
