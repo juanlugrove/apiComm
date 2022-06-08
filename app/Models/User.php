@@ -8,6 +8,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * Class User
@@ -30,7 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class User extends Model
+class User extends Authenticatable implements JWTSubject
 {
 	protected $table = 'users';
 	protected $primaryKey = 'idUser';
@@ -75,5 +77,13 @@ class User extends Model
 	public function usersearchteams()
 	{
 		return $this->hasMany(Usersearchteam::class, 'idUser');
+	}
+
+	public function getJWTIdentifier(){
+		return $this->getKey();
+	}
+
+	public function getJWTCustomClaims(){
+		return [];
 	}
 }

@@ -3,28 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
 
-class UserController extends Controller
+class TeamController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
     public function __construct()
     {
         $this->middleware('auth:api');
     }
 
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
-        $usuarios = User::all();
-        return $usuarios;
+        $teams = Team::all();
+        return $teams;
     }
 
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -32,27 +42,20 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    // public function store(Request $request)
     public function store(Request $request)
-
     {
         $request->validate([
-            'username' => 'required',
-            'mail' => 'required',
-            'password' => 'required',
-            'platform' => 'required'
+            'name' => 'required',
+            'captain' => 'required'
         ]);
-        $usuario = new User();
-        $usuario->username = $request->username;
-        $usuario->mail = $request->mail;
-        $usuario->password = $request->password;
-        $usuario->platform = $request->platform;
+        $team = new Team();
+        $team->name=$request->name;
+        $team->captain=$request->captain;
 
-        // $usuario = $request;
         
-        $usuario->save();
+        $team->save();
 
-        return \response($usuario);
+        return \response($team);
     }
 
     /**
@@ -63,7 +66,9 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        return User::find($id);
+        $team = Team::findOrFail($id);
+
+        return $team;
     }
 
     /**
@@ -86,14 +91,16 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $team = Team::findOrFail($id);
 
         $usuarioLogueado = Auth::user();
-        if($id==$usuarioLogueado->idUser){
-            $usuario = User::findOrFail($id)->update($request->all());
-            return \response($usuario);
-        }
+        if($team->captain==$usuarioLogueado->idUser){
 
+            $team->update($request->all());
+            return \response($team);
+        }
         return response()->json(['error' => 'Unauthorized'], 401);
+
     }
 
     /**
@@ -102,9 +109,8 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $usuario = User::destroy($id);
-        return \response($usuario);
+        Team::destroy($request->idTeam);
     }
 }
