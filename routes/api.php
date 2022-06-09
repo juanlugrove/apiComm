@@ -43,4 +43,10 @@ Route::group([
     Route::post('/team','App\Http\Controllers\TeamController@store');
     Route::get('/team/{id}','App\Http\Controllers\TeamController@show');
     Route::put('/team/{id}','App\Http\Controllers\TeamController@update');
+    Route::delete('/team/{id}','App\Http\Controllers\TeamController@destroy');
+
+    //TEAMUSERS
+    Route::get('/teamUsers','App\Http\Controllers\TeamuserController@index');
+    Route::get('/teamUsers/{idTeam}','App\Http\Controllers\TeamuserController@usersTeam');
+    Route::post('/teamUsers','App\Http\Controllers\TeamuserController@store');
 });

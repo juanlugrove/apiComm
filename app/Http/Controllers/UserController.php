@@ -104,7 +104,13 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $usuario = User::destroy($id);
-        return \response($usuario);
+        $usuario = User::findOrFail($id);
+
+        if(Auth::user()->idUser==$usuario->idUser){
+            $usuario=User::destroy($id);
+            return \response($usuario);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
 }

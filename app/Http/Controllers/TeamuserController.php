@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Teamuser;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TeamController extends Controller
+class TeamuserController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['store']]);
+        $this->middleware('auth:api');
     }
 
 
@@ -23,8 +23,13 @@ class TeamController extends Controller
      */
     public function index()
     {
-        $teams = Team::all();
-        return $teams;
+        $teamUsers = Teamuser::all();
+        return $teamUsers;
+    }
+    public function usersTeam($teamId)
+    {
+        $teamUsers = Teamuser::where('idTeam',$teamId)->get();
+        return $teamUsers;
     }
 
     /**
@@ -46,27 +51,21 @@ class TeamController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required'
+            'idTeam' => 'required',
+            'idUser' => 'required|unique:teamusers'
         ]);
-        $team = new Team();
-        $team->name=$request->name;
-        $team->captain=Auth::user()->idUser;
 
-        if(Teamuser::where("idUser",$team->captain)->count()==0){
-            $team->save();
-            $teamUser=new Teamuser();
-            $teamUser->idTeam=Team::where('captain',$team->captain)->first()->idTeam;
-            $teamUser->idUser=Auth::user()->idUser;
-    
+        if(Auth::user()->idUser==Team::findOrFail($request->idTeam)->captain){
+            $teamUser = new Teamuser();
+            $teamUser->idTeam=$request->idTeam;
+            $teamUser->idUser=$request->idUser;
             $teamUser->save();
-            return \response($team);
-        } else {
-            return response()->json(['error' => 'You already have a team'], 401);
+            return \response($teamUser);
         }
         
+        return response()->json(['error' => 'Unauthorized'], 401);
 
         
-
     }
 
     /**
@@ -77,9 +76,7 @@ class TeamController extends Controller
      */
     public function show($id)
     {
-        $team = Team::findOrFail($id);
-
-        return $team;
+        //
     }
 
     /**
@@ -102,16 +99,7 @@ class TeamController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $team = Team::findOrFail($id);
-
-        $usuarioLogueado = Auth::user();
-        if($team->captain==$usuarioLogueado->idUser){
-
-            $team->update($request->all());
-            return \response($team);
-        }
-        return response()->json(['error' => 'Unauthorized'], 401);
-
+        //
     }
 
     /**
@@ -122,13 +110,6 @@ class TeamController extends Controller
      */
     public function destroy($id)
     {
-        $team = Team::findOrFail($id);
-
-        if(Auth::user()->idUser==$team->captain){
-            $team=Team::destroy($id);
-            return \response($team);
-        }
-
-        return response()->json(['error' => 'Unauthorized'], 401);
+        //
     }
 }
