@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Team;
-use App\Models\Teamuser;
+use App\Models\Usersearchteam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TeamuserController extends Controller
+class UsersearchteamController extends Controller
 {
-
     public function __construct()
     {
         $this->middleware('auth:api');
     }
-
-
+    
     /**
      * Display a listing of the resource.
      *
@@ -23,13 +20,8 @@ class TeamuserController extends Controller
      */
     public function index()
     {
-        $teamUsers = Teamuser::all();
-        return $teamUsers;
-    }
-    public function usersTeam($teamId)
-    {
-        $teamUsers = Teamuser::where('idTeam',$teamId)->get();
-        return $teamUsers;
+        $userST=Usersearchteam::all();
+        return $userST;
     }
 
     /**
@@ -51,21 +43,25 @@ class TeamuserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'idTeam' => 'required',
-            'idUser' => 'required|unique:teamusers'
+            'date' => 'required',
+            'description' => 'required|max:100',
         ]);
-
-        if(Auth::user()->idUser==Team::findOrFail($request->idTeam)->captain){
-            $teamUser = new Teamuser();
-            $teamUser->idTeam=$request->idTeam;
-            $teamUser->idUser=$request->idUser;
-            $teamUser->save();
-            return \response($teamUser);
+        
+        if(Usersearchteam::where('idUser', Auth::user()->idUser)->count()>0){
+            return response()->json(['error' => 'You are already searching a team'], 401);
+            
+        } else {
+                $userST=new Usersearchteam();
+                $userST->idUser=Auth::user()->idUser;
+                $userST->date=$request->date;
+                $userST->description=$request->description;
+                if(isset($request->video)){
+                    $userST->video=$request->video;
+                }
+                $userST->save();
+    
+                return \response($userST);
         }
-        
-        return response()->json(['error' => 'Unauthorized'], 401);
-
-        
     }
 
     /**
@@ -76,7 +72,7 @@ class TeamuserController extends Controller
      */
     public function show($id)
     {
-        //
+        return Usersearchteam::find($id);
     }
 
     /**
@@ -108,17 +104,13 @@ class TeamuserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy()
     {
-        $teamUser = Teamuser::where("idUser",$id)->first();
-
-        if(Auth::user()->idUser==Team::find($teamUser->idTeam)->captain && Team::find($teamUser->idTeam)->captain!=$id){
-            // $teamUser->delete();
-            $prueba= Teamuser::where("idUser",$id)->delete();
-            
-            return \response($prueba);
+        if(Usersearchteam::where('idUser', Auth::user()->idUser)->count()>0){
+            $userST= Usersearchteam::where("idUser", Auth::user()->idUser)->delete();
+            return response()->json(['message' => 'Successfully deleted'], 200);
+        } else {
+            return response()->json(['error' => 'You are not looking for a team yet'], 401);
         }
-
-        return response()->json(['error' => 'Unauthorized'], 401);
     }
 }

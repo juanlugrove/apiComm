@@ -49,4 +49,20 @@ Route::group([
     Route::get('/teamUsers','App\Http\Controllers\TeamuserController@index');
     Route::get('/teamUsers/{idTeam}','App\Http\Controllers\TeamuserController@usersTeam');
     Route::post('/teamUsers','App\Http\Controllers\TeamuserController@store');
+    Route::delete('/teamUsers/{idUser}','App\Http\Controllers\TeamuserController@destroy');
+    
+    //USERSEARCHTEAM
+    Route::get('/userST','App\Http\Controllers\UsersearchteamController@index');
+    Route::get('/userST/{id}','App\Http\Controllers\UsersearchteamController@show');
+    Route::post('/userST','App\Http\Controllers\UsersearchteamController@store');
+    Route::delete('/userST','App\Http\Controllers\UsersearchteamController@destroy');
+    
+    //TEAMSEARCHUSER
+    Route::get('/teamSU','App\Http\Controllers\TeamsearchuserController@index');
+    Route::get('/teamSU/{id}','App\Http\Controllers\TeamsearchuserController@show');
+    Route::post('/teamSU','App\Http\Controllers\TeamsearchuserController@store');
+    Route::delete('/teamSU/{id}','App\Http\Controllers\TeamsearchuserController@destroy');
+
+    //NOTIFICATIONS
+
 });

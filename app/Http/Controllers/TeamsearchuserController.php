@@ -3,19 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
-use App\Models\Teamuser;
+use App\Models\Teamsearchuser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class TeamuserController extends Controller
+class TeamsearchuserController extends Controller
 {
 
     public function __construct()
     {
         $this->middleware('auth:api');
     }
-
-
     /**
      * Display a listing of the resource.
      *
@@ -23,13 +21,8 @@ class TeamuserController extends Controller
      */
     public function index()
     {
-        $teamUsers = Teamuser::all();
-        return $teamUsers;
-    }
-    public function usersTeam($teamId)
-    {
-        $teamUsers = Teamuser::where('idTeam',$teamId)->get();
-        return $teamUsers;
+        $teamSU = Teamsearchuser::all();
+        return $teamSU;
     }
 
     /**
@@ -51,21 +44,29 @@ class TeamuserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'idTeam' => 'required',
-            'idUser' => 'required|unique:teamusers'
+            'date' => 'required',
+            'description' => 'required|max:100',
+            'position' => 'required|max:10'
         ]);
 
-        if(Auth::user()->idUser==Team::findOrFail($request->idTeam)->captain){
-            $teamUser = new Teamuser();
-            $teamUser->idTeam=$request->idTeam;
-            $teamUser->idUser=$request->idUser;
-            $teamUser->save();
-            return \response($teamUser);
-        }
-        
-        return response()->json(['error' => 'Unauthorized'], 401);
+        if(Team::where("captain",Auth::user()->idUser)->count()>0){
+            $team=Team::where("captain",Auth::user()->idUser)->first();
+            if(Teamsearchuser::where("idTeam",$team->idTeam)->count()>=5){
+                return response()->json(['error' => "You have searching 5 players, please delete one to continue"], 401);
+            } else {
+                $teamSU=new Teamsearchuser();
+                $teamSU->idTeam=$team->idTeam;
+                $teamSU->date=$request->date;
+                $teamSU->description=$request->description;
+                $teamSU->position=$request->position;
 
-        
+                $teamSU->save();
+
+                return response()->json(['message' => 'Successfully created'], 200);
+            }
+        } else {
+            return response()->json(['error' => "You aren't the captain for a team"], 401);
+        }
     }
 
     /**
@@ -76,7 +77,7 @@ class TeamuserController extends Controller
      */
     public function show($id)
     {
-        //
+        return Teamsearchuser::find($id);
     }
 
     /**
@@ -110,15 +111,14 @@ class TeamuserController extends Controller
      */
     public function destroy($id)
     {
-        $teamUser = Teamuser::where("idUser",$id)->first();
+        $teamSU=Teamsearchuser::find($id);
+        $team=Team::find($teamSU->idTeam);
 
-        if(Auth::user()->idUser==Team::find($teamUser->idTeam)->captain && Team::find($teamUser->idTeam)->captain!=$id){
-            // $teamUser->delete();
-            $prueba= Teamuser::where("idUser",$id)->delete();
-            
-            return \response($prueba);
+        if($team->captain==Auth::user()->idUser){
+            Teamsearchuser::destroy($id);
+            return response()->json(['message' => 'Successfully deleted'], 200);
+        } else {
+            return response()->json(['error' => 'You are not the captain'], 401);
         }
-
-        return response()->json(['error' => 'Unauthorized'], 401);
     }
 }
