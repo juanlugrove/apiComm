@@ -2,10 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
+use App\Models\Team;
+use App\Models\Teamuser;
+use App\Models\Usersearchteam;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +24,8 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        //
+        $notis=Notification::where('idUser', Auth::user()->idUser)->get();
+        return $notis;
     }
 
     /**
@@ -34,7 +46,31 @@ class NotificationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'idUser' => 'required',
+            'type' => 'required',
+            'idPostulacion' => 'required'
+        ]);
+
+        $noti= new Notification();
+        $noti->idUser=$request->idUser;
+        $noti->type=$request->type;
+        $noti->idPostulacion=$request->idPostulacion;
+        $noti->sendBy=Auth::user()->idUser;
+        if(Auth::user()->idUser!=$request->idUser){
+            if(Notification::where("idPostulacion",$request->idPostulacion)->where("sendBy",Auth::user()->idUser)->count()>0){
+                return response()->json(['error' => 'You are already postulated'], 401);
+            }
+            if($noti->type=="user" && Teamuser::where("idUser",Auth::user()->userId)->count()>0){
+                return response()->json(['error' => 'You are already in a team'], 401);
+            } else if(Team::where("captain",Auth::user()->idUser)->count()==0){
+                return response()->json(['error' => 'You are not the captain'], 401);
+            }
+            $noti->save();
+            return response()->json(['message' => 'Successfully created'], 200);
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
+
     }
 
     /**
@@ -69,6 +105,26 @@ class NotificationController extends Controller
     public function update(Request $request, $id)
     {
         //
+    }
+
+    public function acceptNotification($idNoti){
+        $noti=Notification::find($idNoti);
+        if($noti->idUser==Auth::user()->idUser){
+            if($noti->type=="user"){
+                $teamUser = new Teamuser();
+                $teamUser->idTeam=Team::where("captain",Auth::user()->idUser)->first()->idTeam;
+                $teamUser->idUser=$noti->sendBy;
+                $teamUser->save();
+                return response()->json(['message' => 'Successfully accepted'], 200);
+            } else if($noti->type=="team"){
+                $teamUser = new Teamuser();
+                $teamUser->idTeam=Team::where("captain",$noti->sendBy)->first()->idTeam;
+                $teamUser->idUser=Auth::user()->idUser;
+                $teamUser->save();
+                return response()->json(['message' => 'Successfully accepted'], 200);
+            }
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
 
     /**

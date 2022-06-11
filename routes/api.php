@@ -62,7 +62,11 @@ Route::group([
     Route::get('/teamSU/{id}','App\Http\Controllers\TeamsearchuserController@show');
     Route::post('/teamSU','App\Http\Controllers\TeamsearchuserController@store');
     Route::delete('/teamSU/{id}','App\Http\Controllers\TeamsearchuserController@destroy');
-
+    
     //NOTIFICATIONS
+    Route::get('/notifications','App\Http\Controllers\NotificationController@index');
+    Route::post('/notifications','App\Http\Controllers\NotificationController@store');
+    Route::get('/notifications/{id}','App\Http\Controllers\NotificationController@show');
+    Route::post('/notifications/accept/{id}','App\Http\Controllers\NotificationController@acceptNotification');
 
 });
