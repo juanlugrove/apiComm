@@ -127,6 +127,15 @@ class NotificationController extends Controller
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
+    public function declineNotification($idNoti){
+        $noti=Notification::find($idNoti);
+        if($noti->idUser==Auth::user()->idUser){
+            Notification::destroy($idNoti);
+            return response()->json(['message' => 'Successfully deleted'], 200);
+        }
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
     /**
      * Remove the specified resource from storage.
      *

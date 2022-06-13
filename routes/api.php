@@ -68,5 +68,6 @@ Route::group([
     Route::post('/notifications','App\Http\Controllers\NotificationController@store');
     Route::get('/notifications/{id}','App\Http\Controllers\NotificationController@show');
     Route::post('/notifications/accept/{id}','App\Http\Controllers\NotificationController@acceptNotification');
+    Route::post('/notifications/decline/{id}','App\Http\Controllers\NotificationController@declineNotification');
 
 });
