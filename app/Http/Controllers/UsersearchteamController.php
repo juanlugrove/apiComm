@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Usersearchteam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class UsersearchteamController extends Controller
 {
@@ -20,8 +22,16 @@ class UsersearchteamController extends Controller
      */
     public function index()
     {
-        $userST=Usersearchteam::all();
-        return $userST;
+        $userST=Usersearchteam::orderBy('date', 'ASC')->get();
+        $userSTconNombre=[];
+        foreach ($userST as $userI) {
+            $jugador=User::find($userI->idUser);
+            $userI->setAttribute("username",$jugador->username);
+            $userI->setAttribute("position",$jugador->position);
+            $userI->setAttribute("secondPosition",$jugador->secondPosition);
+            $userSTconNombre[]=$userI;
+        }
+        return $userSTconNombre;
     }
 
     /**
@@ -43,7 +53,6 @@ class UsersearchteamController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'date' => 'required',
             'description' => 'required|max:100',
         ]);
         
@@ -53,7 +62,7 @@ class UsersearchteamController extends Controller
         } else {
                 $userST=new Usersearchteam();
                 $userST->idUser=Auth::user()->idUser;
-                $userST->date=$request->date;
+                $userST->date=Carbon::now();
                 $userST->description=$request->description;
                 if(isset($request->video)){
                     $userST->video=$request->video;

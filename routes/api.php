@@ -34,7 +34,7 @@ Route::group([
     'middleware' => 'api',
 ], function ($router){
     // Route::get('/usuarios','App\Http\Controllers\UserController@index'); //mostrar todos los usuarios
-    Route::get('/usuarios/{id}','App\Http\Controllers\UserController@show'); //mostrar un usuario
+    Route::get('/usuarios','App\Http\Controllers\UserController@show'); //mostrar un usuario
     // Route::post('/usuarios','App\Http\Controllers\UserController@store'); //crear usuario
     Route::put('/usuarios/{id}','App\Http\Controllers\UserController@update'); //actualizar
     Route::delete('/usuarios/{id}','App\Http\Controllers\UserController@destroy'); //borrar

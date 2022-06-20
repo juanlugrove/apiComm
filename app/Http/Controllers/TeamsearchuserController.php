@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Team;
 use App\Models\Teamsearchuser;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,8 +23,16 @@ class TeamsearchuserController extends Controller
      */
     public function index()
     {
-        $teamSU = Teamsearchuser::all();
-        return $teamSU;
+        $teamSU = Teamsearchuser::orderBy('date', 'ASC')->get();
+        $teamSUconNombre=[];
+        foreach ($teamSU as $team) {
+            $equipo=Team::find($team->idTeam);
+            $team->setAttribute("nameTeam",$equipo->name);
+            $capi=User::find($equipo->captain);
+            $team->setAttribute("nameCaptain",$capi->username);
+            $teamSUconNombre[]=$team;
+        }
+        return $teamSUconNombre;
     }
 
     /**
@@ -44,7 +54,6 @@ class TeamsearchuserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'date' => 'required',
             'description' => 'required|max:100',
             'position' => 'required|max:10'
         ]);
@@ -56,7 +65,7 @@ class TeamsearchuserController extends Controller
             } else {
                 $teamSU=new Teamsearchuser();
                 $teamSU->idTeam=$team->idTeam;
-                $teamSU->date=$request->date;
+                $teamSU->date=Carbon::now();
                 $teamSU->description=$request->description;
                 $teamSU->position=$request->position;
 
