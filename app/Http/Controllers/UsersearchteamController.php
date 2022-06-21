@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Teamuser;
 use App\Models\User;
 use App\Models\Usersearchteam;
 use Illuminate\Http\Request;
@@ -55,21 +56,24 @@ class UsersearchteamController extends Controller
         $request->validate([
             'description' => 'required|max:100',
         ]);
-        
-        if(Usersearchteam::where('idUser', Auth::user()->idUser)->count()>0){
-            return response()->json(['error' => 'You are already searching a team'], 401);
-            
-        } else {
+        if(!Teamuser::where("idUser",Auth::user()->idUser)->first()){
+            if(Usersearchteam::where('idUser', Auth::user()->idUser)->count()>0){
+                return response()->json(['error' => 'You are already searching a team'], 401);
+                
+            } else {
                 $userST=new Usersearchteam();
                 $userST->idUser=Auth::user()->idUser;
                 $userST->date=Carbon::now();
                 $userST->description=$request->description;
                 if(isset($request->video)){
-                    $userST->video=$request->video;
-                }
-                $userST->save();
-    
-                return \response($userST);
+                        $userST->video=$request->video;
+                    }
+                    $userST->save();
+        
+                    return \response($userST);
+            }
+        } else {
+            return response()->json(['error' => 'You are already in a team'], 401);
         }
     }
 

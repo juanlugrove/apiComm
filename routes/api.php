@@ -27,6 +27,8 @@ Route::group([
     Route::post('refresh','App\HTTP\Controllers\AuthController@refresh');
     Route::post('me','App\HTTP\Controllers\AuthController@me');
     Route::post('register','App\HTTP\Controllers\AuthController@register');
+    Route::get('/username/{username}','App\HTTP\Controllers\AuthController@nombreUsado'); //borrar
+    Route::get('/mail/{mail}','App\HTTP\Controllers\AuthController@correoUsado'); //borrar
 });
 
 
@@ -41,6 +43,7 @@ Route::group([
 
     //TEAM
     Route::post('/team','App\Http\Controllers\TeamController@store');
+    Route::get('/team','App\Http\Controllers\TeamController@index');
     Route::get('/team/{id}','App\Http\Controllers\TeamController@show');
     Route::put('/team/{id}','App\Http\Controllers\TeamController@update');
     Route::delete('/team/{id}','App\Http\Controllers\TeamController@destroy');
@@ -49,6 +52,7 @@ Route::group([
     Route::get('/teamUsers','App\Http\Controllers\TeamuserController@index');
     Route::get('/teamUsers/{idTeam}','App\Http\Controllers\TeamuserController@usersTeam');
     Route::post('/teamUsers','App\Http\Controllers\TeamuserController@store');
+    Route::delete('/teamUsers','App\Http\Controllers\TeamuserController@salir');
     Route::delete('/teamUsers/{idUser}','App\Http\Controllers\TeamuserController@destroy');
     
     //USERSEARCHTEAM
@@ -66,7 +70,7 @@ Route::group([
     //NOTIFICATIONS
     Route::get('/notifications','App\Http\Controllers\NotificationController@index');
     Route::post('/notifications','App\Http\Controllers\NotificationController@store');
-    Route::get('/notifications/{id}','App\Http\Controllers\NotificationController@show');
+    // Route::get('/notifications/{id}','App\Http\Controllers\NotificationController@show');
     Route::post('/notifications/accept/{id}','App\Http\Controllers\NotificationController@acceptNotification');
     Route::post('/notifications/decline/{id}','App\Http\Controllers\NotificationController@declineNotification');
 

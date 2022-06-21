@@ -29,6 +29,7 @@ class TeamsearchuserController extends Controller
             $equipo=Team::find($team->idTeam);
             $team->setAttribute("nameTeam",$equipo->name);
             $capi=User::find($equipo->captain);
+            $team->setAttribute("captain",$equipo->captain);
             $team->setAttribute("nameCaptain",$capi->username);
             $teamSUconNombre[]=$team;
         }

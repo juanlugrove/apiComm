@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Teamuser;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class TeamController extends Controller
@@ -23,8 +24,20 @@ class TeamController extends Controller
      */
     public function index()
     {
-        $teams = Team::all();
-        return $teams;
+        $teamU = Teamuser::where("idUser",Auth::user()->idUser)->first();
+        $team=null;
+        if($teamU){
+            $team = Team::find($teamU->idTeam);
+            $miembros=Teamuser::where("idTeam",$team->idTeam)->get();
+            $miembrosEnviar=[];
+            foreach ($miembros as $miembro) {
+                $miembro->setAttribute("username",User::find($miembro->idUser)->username);
+                $miembro->setAttribute("logo",User::find($miembro->idUser)->logo);
+                $miembroEnviar[]=$miembro;
+            }
+            $team->setAttribute("miembros",$miembros);
+        }
+        return $team;
     }
 
     /**

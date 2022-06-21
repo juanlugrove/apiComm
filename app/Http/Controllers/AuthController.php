@@ -18,7 +18,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register','nombreUsado','correoUsado']]);
     }
 
     /**
@@ -106,5 +106,23 @@ class AuthController extends Controller
             'message' => 'Usuario registrado exitosamente',
             'user' => $user
         ], 201);
+    }
+
+    public function nombreUsado($username){
+        $users= User::where('username', $username)->get();
+        if(count($users)>0){
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
+    public function correoUsado($mail){
+        $users= User::where('mail', $mail)->get();
+        if(count($users)>0){
+            return "true";
+        } else {
+            return "false";
+        }
     }
 }

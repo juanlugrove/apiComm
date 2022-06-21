@@ -108,6 +108,22 @@ class TeamuserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function salir(){
+        $teamUser=Teamuser::where("idUser",Auth::user()->idUser);
+        if(Team::find($teamUser->first()->idTeam)->captain!=Auth::user()->idUser){
+            $prueba= $teamUser->delete();
+            return \response($prueba);
+        } else if(count(Teamuser::where("idTeam",$teamUser->first()->idTeam)->get())>1){
+            
+            return response()->json(['error' => 'You are the captain'], 401);
+        } else {
+            $idTeam=$teamUser->first()->idTeam;
+            $prueba= $teamUser->delete();
+            Team::find($idTeam)->delete();
+            return \response($idTeam);
+        }
+    }
+
     public function destroy($id)
     {
         $teamUser = Teamuser::where("idUser",$id)->first();
