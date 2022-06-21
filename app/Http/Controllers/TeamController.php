@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Teamuser;
@@ -75,6 +76,7 @@ class TeamController extends Controller
             $teamUser->idTeam=Team::where('captain',$team->captain)->first()->idTeam;
             $teamUser->idUser=Auth::user()->idUser;
             Usersearchteam::where("idUser",Auth::user()->idUser)->delete();
+            Notification::where("sendBy",Auth::user()->idUser)->delete();
             $teamUser->save();
             return \response($team);
         } else {
