@@ -22,13 +22,13 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
 ], function ($router){
-    Route::post('logout','App\HTTP\Controllers\AuthController@logout');
-    Route::post('login','App\HTTP\Controllers\AuthController@login');
-    Route::post('refresh','App\HTTP\Controllers\AuthController@refresh');
-    Route::post('me','App\HTTP\Controllers\AuthController@me');
-    Route::post('register','App\HTTP\Controllers\AuthController@register');
-    Route::get('/username/{username}','App\HTTP\Controllers\AuthController@nombreUsado'); //borrar
-    Route::get('/mail/{mail}','App\HTTP\Controllers\AuthController@correoUsado'); //borrar
+    Route::post('logout','App\Http\Controllers\AuthController@logout');
+    Route::post('login','App\Http\Controllers\AuthController@login');
+    Route::post('refresh','App\Http\Controllers\AuthController@refresh');
+    Route::post('me','App\Http\Controllers\AuthController@me');
+    Route::post('register','App\Http\Controllers\AuthController@register');
+    Route::get('/username/{username}','App\Http\Controllers\AuthController@nombreUsado'); //borrar
+    Route::get('/mail/{mail}','App\Http\Controllers\AuthController@correoUsado'); //borrar
 });
 
 
