@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Teamuser;
 use App\Models\User;
+use App\Models\Usersearchteam;
 use Illuminate\Support\Facades\Auth;
 
 class TeamController extends Controller
@@ -64,13 +65,16 @@ class TeamController extends Controller
         $team = new Team();
         $team->name=$request->name;
         $team->captain=Auth::user()->idUser;
+        if($request->twitter){
+            $team->twitter=$request->twitter;
+        }
 
         if(Teamuser::where("idUser",$team->captain)->count()==0){
             $team->save();
             $teamUser=new Teamuser();
             $teamUser->idTeam=Team::where('captain',$team->captain)->first()->idTeam;
             $teamUser->idUser=Auth::user()->idUser;
-    
+            Usersearchteam::where("idUser",Auth::user()->idUser)->delete();
             $teamUser->save();
             return \response($team);
         } else {
